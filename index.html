@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú - El Punto del Sabor</title>
+    <style>
+        /* ESTILOS (DISEÑO) */
+        :root {
+            --primary: #FFCC00; /* Amarillo Simpsons */
+            --secondary: #E31837; /* Rojo */
+            --bg-dark: #121212;
+            --card-bg: #1E1E1E;
+            --text-light: #FFFFFF;
+        }
+        
+        * { box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); margin: 0; padding-bottom: 80px; }
+        
+        header { background-color: var(--secondary); padding: 15px; text-align: center; color: var(--primary); font-weight: bold; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); position: sticky; top: 0; z-index: 100;}
+        header span { color: white; display: block; font-size: 12px; margin-top: 5px; font-weight: normal; }
+        
+        /* Contenedores */
+        .container { padding: 15px; }
+        
+        /* Grilla de Categorías */
+        #categorias { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-categoria { background-color: var(--card-bg); border: 2px solid var(--primary); color: var(--primary); border-radius: 12px; padding: 20px 10px; text-align: center; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+        .btn-categoria:active { background-color: var(--primary); color: var(--bg-dark); }
+        .emoji { font-size: 35px; }
+        
+        /* Lista de Productos (Oculta al inicio) */
+        #productos { display: none; }
+        .btn-volver { background: none; border: none; color: var(--primary); font-size: 16px; margin-bottom: 15px; cursor: pointer; text-decoration: underline; }
+        
+        .producto-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--secondary); display: flex; justify-content: space-between; align-items: center; }
+        .producto-info h3 { margin: 0 0 5px 0; font-size: 18px; color: var(--primary); }
+        .producto-info p { margin: 0 0 8px 0; font-size: 12px; color: #aaa; max-width: 200px;}
+        .producto-precio { font-weight: bold; font-size: 16px; }
+        
+        .btn-agregar { background-color: var(--secondary); color: white; border: none; border-radius: 8px; padding: 10px 15px; font-weight: bold; cursor: pointer; font-size: 18px; }
+        .btn-agregar:active { transform: scale(0.95); }
+
+        /* Carrito Flotante */
+        #btn-carrito-flotante { position: fixed; bottom: 20px; right: 20px; background-color: var(--primary); color: var(--bg-dark); border: none; border-radius: 50px; padding: 15px 25px; font-size: 16px; font-weight: bold; box-shadow: 0 5px 15px rgba(255,204,0,0.4); cursor: pointer; z-index: 1000; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+        #badge-carrito { background: var(--secondary); color: white; border-radius: 50%; padding: 2px 8px; font-size: 14px; }
+
+        /* Modal del Carrito */
+        #modal-carrito { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background-color: var(--bg-dark); width: 100%; max-width: 400px; border-radius: 15px; border: 2px solid var(--primary); padding: 20px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .modal-header h2 { margin: 0; color: var(--primary); }
+        .btn-cerrar { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        
+        .item-carrito { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #333; padding-bottom: 10px;}
+        .controles-cantidad { display: flex; align-items: center; gap: 10px; }
+        .btn-qty { background: #333; color: white; border: none; width: 30px; height: 30px; border-radius: 5px; font-size: 18px; cursor: pointer;}
+        
+        .total-container { display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; margin-top: 20px; padding-top: 10px; color: var(--primary); }
+        
+        .btn-whatsapp { display: block; width: 100%; background-color: #25D366; color: white; text-align: center; padding: 15px; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 20px; border: none; cursor: pointer; }
+        
+        .empty-cart { text-align: center; color: #aaa; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <header>
+        El Punto del Sabor
+        <span>Carmelo, Frente al Polideportivo | 4PM - 11PM</span>
+    </header>
+
+    <div class="container">
+        <!-- VISTA DE CATEGORIAS -->
+        <div id="categorias">
+            <!-- Las categorías se cargan con JavaScript -->
+        </div>
+
+        <!-- VISTA DE PRODUCTOS -->
+        <div id="productos">
+            <button class="btn-volver" onclick="mostrarCategorias()">← Volver al menú principal</button>
+            <h2 id="titulo-categoria" style="color: var(--primary); margin-top: 0;">Categoría</h2>
+            <div id="lista-productos">
+                <!-- Los productos se cargan con JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTON FLOTANTE -->
+    <button id="btn-carrito-flotante" onclick="abrirCarrito()">
+        🛒 Ver Pedido <span id="badge-carrito">0</span>
+    </button>
+
+    <!-- MODAL DEL CARRITO -->
+    <div id="modal-carrito">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tu Pedido</h2>
+                <button class="btn-cerrar" onclick="cerrarCarrito()">×</button>
+            </div>
+            
+            <div id="items-carrito">
+                <!-- Items del carrito -->
+            </div>
+            
+            <div class="total-container">
+                <span>Total:</span>
+                <span id="total-precio">$0</span>
+            </div>
+            
+            <button class="btn-whatsapp" onclick="enviarWhatsApp()">
+                Enviar Pedido por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- BASE DE DATOS DEL MENÚ ---
+        // Aquí puedes agregar, borrar o cambiar precios fácilmente en el futuro
+        const menu = {
+            "Hamburguesas": {
+                icono: "🍔",
+                items: [
+                    { nombre: "Sencilla", desc: "Carne, pollo o cerdo, queso, ripio, salsas, etc.", precio: 14000 },
+                    { nombre: "Especial", desc: "Carne, pollo o cerdo, tocineta, jamón, huevo...", precio: 16000 },
+                    { nombre: "Chuleta Ahumada", desc: "Chuleta ahumada, queso, papas, huevo...", precio: 17000 },
+                    { nombre: "Mixta Doble Proteina", desc: "Pollo, carne o jamón (al barril)...", precio: 20000 },
+                    { nombre: "Especial Carne al Barril", desc: "Pollo, carne o cerdo al barril...", precio: 26000 },
+                    { nombre: "La 4x4", desc: "Pollo, carne, cerdo, chorizo, tocineta...", precio: 30000 }
+                ]
+            },
+            "Salchipapas": {
+                icono: "🍟",
+                items: [
+                    { nombre: "Sencilla", desc: "Personal", precio: 8000 },
+                    { nombre: "Con Queso", desc: "Personal", precio: 9000 },
+                    { nombre: "Doble Queso", desc: "Personal", precio: 10000 },
+                    { nombre: "Tocineta y Queso", desc: "Personal", precio: 11000 },
+                    { nombre: "Chorizo y Queso", desc: "Personal", precio: 12000 },
+                    { nombre: "Pollo y Queso", desc: "Personal", precio: 13000 },
+                    { nombre: "Carne Mechada y Queso", desc: "Personal", precio: 14000 },
+                    { nombre: "Mixta (Personal)", desc: "Carne, pollo, costilla, queso...", precio: 17000 },
+                    { nombre: "Familiar Básico", desc: "Papa, salchicha, ripio", precio: 16000 },
+                    { nombre: "Familiar Full", desc: "Costilla, tocineta, chorizo, maduro, queso", precio: 30000 },
+                    { nombre: "La Consentida", desc: "Todas las adiciones juntas", precio: 40000 }
+                ]
+            },
+            "Perros Calientes": {
+                icono: "🌭",
+                items: [
+                    { nombre: "Sencillo", desc: "Pan, salchicha, queso, ripio, salsas", precio: 8000 },
+                    { nombre: "Mixto", desc: "Tocineta, queso, salsas...", precio: 10000 },
+                    { nombre: "Pepi-perro", desc: "Carne mechada o pollo", precio: 12000 },
+                    { nombre: "Choriperro", desc: "Chorizo, ensalada, ripio", precio: 12000 },
+                    { nombre: "Trifásico", desc: "Carne, pollo, chorizo, queso", precio: 17000 }
+                ]
+            },
+            "Pepitos": {
+                icono: "🥖",
+                items: [
+                    { nombre: "Sencillo", desc: "Una proteína, queso, jamón, aguacate, huevo", precio: 25000 },
+                    { nombre: "Mixto", desc: "Dos proteínas, doble queso, tocineta...", precio: 35000 },
+                    { nombre: "El Barco", desc: "Carne, pollo, cerdo, chorizo, tocineta...", precio: 45000 }
+                ]
+            },
+            "Pizzas": {
+                icono: "🍕",
+                items: [
+                    { nombre: "Hawaiana (Personal)", desc: "4 Porciones", precio: 12000 },
+                    { nombre: "Hawaiana (Mediana)", desc: "8 Porciones", precio: 33000 },
+                    { nombre: "Pollo Champiñón (Personal)", desc: "4 Porciones", precio: 12000 },
+                    { nombre: "Pollo Champiñón (Mediana)", desc: "8 Porciones", precio: 33000 },
+                    { nombre: "Margarita (Mediana)", desc: "8 Porciones", precio: 33000 },
+                    { nombre: "Jamón y Queso (Familiar)", desc: "12 Porciones", precio: 45000 }
+                ]
+            },
+            "Carne al Barril": {
+                icono: "🥩",
+                items: [
+                    { nombre: "Parrilla Personal", desc: "Con papa, chorizo y ensalada", precio: 15000 },
+                    { nombre: "Parrilla para 2", desc: "Con papa, chorizo y ensalada", precio: 25000 },
+                    { nombre: "Parrilla para 3", desc: "Con papa, chorizo y ensalada", precio: 35000 },
+                    { nombre: "Parrilla para 4", desc: "Con papa, chorizo y ensalada", precio: 50000 }
+                ]
+            },
+            "Adicionales": {
+                icono: "➕",
+                items: [
+                    { nombre: "Porción de papa", desc: "", precio: 5000 },
+                    { nombre: "Maíz Gratinado", desc: "", precio: 7000 },
+                    { nombre: "Carne Mechada", desc: "", precio: 6000 },
+                    { nombre: "Tocineta", desc: "", precio: 3000 },
+                    { nombre: "Chorizo", desc: "", precio: 4000 }
+                ]
+            }
+        };
+
+        // --- LÓGICA DE LA APLICACIÓN ---
+        let carrito = [];
+        const numeroWhatsApp = "573165593401"; // Tu número con código de Colombia
+
+        // Formato de moneda
+        const formatoPrecio = (precio) => {
+            return "$" + precio.toLocaleString('es-CO');
+        };
+
+        // Inicializar Categorías
+        function init() {
+            const divCategorias = document.getElementById('categorias');
+            divCategorias.innerHTML = '';
+            
+            for (const cat in menu) {
+                divCategorias.innerHTML += `
+                    <button class="btn-categoria" onclick="mostrarProductos('${cat}')">
+                        <span class="emoji">${menu[cat].icono}</span>
+                        ${cat}
+                    </button>
+                `;
+            }
+        }
+
+        // Mostrar productos de una categoría
+        function mostrarProductos(categoria) {
+            document.getElementById('categorias').style.display = 'none';
+            document.getElementById('productos').style.display = 'block';
+            document.getElementById('titulo-categoria').innerText = categoria;
+            window.scrollTo(0, 0);
+
+            const lista = document.getElementById('lista-productos');
+            lista.innerHTML = '';
+
+            menu[categoria].items.forEach((item, index) => {
+                lista.innerHTML += `
+                    <div class="producto-card">
+                        <div class="producto-info">
+                            <h3>${item.nombre}</h3>
+                            <p>${item.desc}</p>
+                            <div class="producto-precio">${formatoPrecio(item.precio)}</div>
+                        </div>
+                        <button class="btn-agregar" onclick="agregarAlCarrito('${item.nombre}', ${item.precio})">+</button>
+                    </div>
+                `;
+            });
+        }
+
+        // Volver al inicio
+        function mostrarCategorias() {
+            document.getElementById('productos').style.display = 'none';
+            document.getElementById('categorias').style.display = 'grid';
+        }
+
+        // Funciones del Carrito
+        function agregarAlCarrito(nombre, precio) {
+            const itemExistente = carrito.find(item => item.nombre === nombre);
+            if (itemExistente) {
+                itemExistente.cantidad++;
+            } else {
+                carrito.push({ nombre, precio, cantidad: 1 });
+            }
+            actualizarUI();
+            
+            // Efecto visual rápido
+            const badge = document.getElementById('badge-carrito');
+            badge.style.transform = "scale(1.5)";
+            setTimeout(() => badge.style.transform = "scale(1)", 200);
+        }
+
+        function cambiarCantidad(nombre, delta) {
+            const item = carrito.find(item => item.nombre === nombre);
+            if (item) {
+                item.cantidad += delta;
+                if (item.cantidad <= 0) {
+                    carrito = carrito.filter(i => i.nombre !== nombre);
+                }
+            }
+            actualizarUI();
+        }
+
+        function actualizarUI() {
+            // Actualizar botón flotante
+            const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            document.getElementById('badge-carrito').innerText = totalItems;
+
+            if (totalItems > 0) {
+                document.getElementById('btn-carrito-flotante').style.display = 'flex';
+            } else {
+                document.getElementById('btn-carrito-flotante').style.display = 'none';
+                cerrarCarrito();
+            }
+
+            // Actualizar Modal
+            const contenedorItems = document.getElementById('items-carrito');
+            contenedorItems.innerHTML = '';
+            
+            let totalPrecio = 0;
+
+            if (carrito.length === 0) {
+                contenedorItems.innerHTML = '<div class="empty-cart">Tu carrito está vacío</div>';
+            } else {
+                carrito.forEach(item => {
+                    const subtotal = item.precio * item.cantidad;
+                    totalPrecio += subtotal;
+                    
+                    contenedorItems.innerHTML += `
+                        <div class="item-carrito">
+                            <div>
+                                <h4 style="margin: 0; color: white;">${item.nombre}</h4>
+                                <small style="color: #aaa;">${formatoPrecio(item.precio)} c/u</small>
+                            </div>
+                            <div class="controles-cantidad">
+                                <button class="btn-qty" onclick="cambiarCantidad('${item.nombre}', -1)">-</button>
+                                <span>${item.cantidad}</span>
+                                <button class="btn-qty" onclick="cambiarCantidad('${item.nombre}', 1)">+</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('total-precio').innerText = formatoPrecio(totalPrecio);
+        }
+
+        // Manejo del Modal
+        function abrirCarrito() {
+            document.getElementById('modal-carrito').style.display = 'flex';
+        }
+
+        function cerrarCarrito() {
+            document.getElementById('modal-carrito').style.display = 'none';
+        }
+
+        // Enviar a WhatsApp
+        function enviarWhatsApp() {
+            if (carrito.length === 0) return;
+
+            let texto = "*¡Hola El Punto del Sabor!* 👋%0AQuiero realizar el siguiente pedido:%0A%0A";
+            let total = 0;
+
+            carrito.forEach(item => {
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                texto += `▪️ ${item.cantidad}x ${item.nombre} - ${formatoPrecio(subtotal)}%0A`;
+            });
+
+            texto += `%0A*TOTAL: ${formatoPrecio(total)}*%0A%0A_Por favor confirmar mi pedido y tiempo de entrega. ¡Gracias!_`;
+
+            const url = `https://wa.me/${numeroWhatsApp}?text=${texto}`;
+            
+            // Limpiar carrito (opcional)
+            carrito = [];
+            actualizarUI();
+            cerrarCarrito();
+            mostrarCategorias();
+
+            // Abrir WhatsApp
+            window.open(url, '_blank');
+        }
+
+        // Iniciar App
+        init();
+        actualizarUI();
+    </script>
+</body>
+</html>
