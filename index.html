@@ -29,7 +29,7 @@
         .btn-categoria:active { background-color: var(--primary); color: var(--bg-dark); }
         .emoji { font-size: 35px; }
         
-        /* Lista de Productos (Oculta al inicio) */
+        /* Lista de Productos */
         #productos { display: none; }
         .btn-volver { background: none; border: none; color: var(--primary); font-size: 16px; margin-bottom: 15px; cursor: pointer; text-decoration: underline; }
         
@@ -56,11 +56,18 @@
         .controles-cantidad { display: flex; align-items: center; gap: 10px; }
         .btn-qty { background: #333; color: white; border: none; width: 30px; height: 30px; border-radius: 5px; font-size: 18px; cursor: pointer;}
         
-        .total-container { display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; margin-top: 20px; padding-top: 10px; color: var(--primary); }
+        .total-container { display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; margin-top: 15px; margin-bottom: 15px; color: var(--primary); }
         
-        .btn-whatsapp { display: block; width: 100%; background-color: #25D366; color: white; text-align: center; padding: 15px; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 20px; border: none; cursor: pointer; }
+        .btn-whatsapp { display: block; width: 100%; background-color: #25D366; color: white; text-align: center; padding: 15px; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 15px; border: none; cursor: pointer; }
         
         .empty-cart { text-align: center; color: #aaa; margin: 20px 0; }
+
+        /* Estilos para los campos de datos de envío */
+        .datos-envio { margin-top: 15px; border-top: 1px solid #333; padding-top: 15px; }
+        .datos-envio h3 { margin: 0 0 10px 0; font-size: 16px; color: var(--primary); }
+        .input-form { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #555; background-color: #222; color: white; font-size: 14px; }
+        .input-form:focus { outline: none; border-color: var(--primary); }
+        .hint-text { font-size: 11px; color: #aaa; margin: 0 0 10px 0; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -72,22 +79,18 @@
 
     <div class="container">
         <!-- VISTA DE CATEGORIAS -->
-        <div id="categorias">
-            <!-- Las categorías se cargan con JavaScript -->
-        </div>
+        <div id="categorias"></div>
 
         <!-- VISTA DE PRODUCTOS -->
         <div id="productos">
             <button class="btn-volver" onclick="mostrarCategorias()">← Volver al menú principal</button>
             <h2 id="titulo-categoria" style="color: var(--primary); margin-top: 0;">Categoría</h2>
-            <div id="lista-productos">
-                <!-- Los productos se cargan con JavaScript -->
-            </div>
+            <div id="lista-productos"></div>
         </div>
     </div>
 
     <!-- BOTON FLOTANTE -->
-    <button id="btn-carrito-flotante" onclick="abrirCarrito()">
+    <button id="btn-carrito-flotante" onclick="abrirCarrito()" style="display: none;">
         🛒 Ver Pedido <span id="badge-carrito">0</span>
     </button>
 
@@ -99,24 +102,29 @@
                 <button class="btn-cerrar" onclick="cerrarCarrito()">×</button>
             </div>
             
-            <div id="items-carrito">
-                <!-- Items del carrito -->
-            </div>
+            <div id="items-carrito"></div>
             
-            <div class="total-container">
+            <div class="total-container" id="contenedor-total" style="display:none;">
                 <span>Total:</span>
                 <span id="total-precio">$0</span>
             </div>
-            
-            <button class="btn-whatsapp" onclick="enviarWhatsApp()">
-                Enviar Pedido por WhatsApp
-            </button>
+
+            <!-- FORMULARIO DE ENVÍO -->
+            <div class="datos-envio" id="seccion-envio" style="display:none;">
+                <h3>Datos para la entrega 🛵</h3>
+                <input type="text" id="cliente-direccion" class="input-form" placeholder="Tu dirección exacta (Ej: Calle 10 # 5-20)">
+                <input type="tel" id="cliente-telefono" class="input-form" placeholder="Número de teléfono (Opcional)">
+                <p class="hint-text">💡 <b>Sugerencia:</b> Una vez nos envíes el pedido, puedes compartirnos tu ubicación GPS por WhatsApp para llegar más rápido.</p>
+                
+                <button class="btn-whatsapp" onclick="enviarWhatsApp()">
+                    Enviar Pedido por WhatsApp
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
         // --- BASE DE DATOS DEL MENÚ ---
-        // Aquí puedes agregar, borrar o cambiar precios fácilmente en el futuro
         const menu = {
             "Hamburguesas": {
                 icono: "🍔",
@@ -136,71 +144,49 @@
                     { nombre: "Con Queso", desc: "Personal", precio: 9000 },
                     { nombre: "Doble Queso", desc: "Personal", precio: 10000 },
                     { nombre: "Tocineta y Queso", desc: "Personal", precio: 11000 },
-                    { nombre: "Guiso mas Queso", desc: "Personal", precio: 10000 },
                     { nombre: "Chorizo y Queso", desc: "Personal", precio: 12000 },
                     { nombre: "Pollo y Queso", desc: "Personal", precio: 13000 },
                     { nombre: "Carne Mechada y Queso", desc: "Personal", precio: 14000 },
-                    { nombre: "Queso, Costilla y Madurito", desc: "Personal", precio: 15000 },
-                    { nombre: "Costipapa", desc: "Personal", precio: 16000 },
-                    { nombre: "Carne Mechada, Madurito y Queso", desc: "Personal", precio: 15000 },
-                    { nombre: "Pollo Mechada, Madurito y Queso", desc: "Personal", precio: 15000 },
-                    { nombre: "Carne Mechada y Queso", desc: "Personal", precio: 14000 },
-                    { nombre: "Mixta (Personal)", desc: "Carne, pollo, queso", precio: 15000 },
-                    { nombre: "Costilla, Carne Mechada y Queso", desc: "Personal", precio: 17000 },
+                    { nombre: "Mixta (Personal)", desc: "Carne, pollo, costilla, queso...", precio: 17000 },
                     { nombre: "Familiar Básico", desc: "Papa, salchicha, ripio", precio: 16000 },
-                    { nombre: "Familiar Media", desc: "Costilla, Tocineta, Maduro y Queso", precio: 20000 },
-                    { nombre: "Familiar Cargada", desc: "Tocineta, Chorizo, Maduro y Queso", precio: 26000 },
-                    { nombre: "Familiar Full", desc: "Costilla, tocineta, chorizo, maduro y queso", precio: 30000 },
-                    { nombre: "La Consentida 1", desc: "Maíz, Carne Mechada, Maduros y Alitas BBQ", precio: 40000 },
-                    { nombre: "La Consentida 2", desc: "Pollo Salteado, Tocineta, Lomo y Piña Calada", precio: 40000 },
-                    { nombre: "La Consentida 3", desc: "Costilla, Chorizo, Queso Gratinado y Pollo Mechado", precio: 40000 }
+                    { nombre: "Familiar Full", desc: "Costilla, tocineta, chorizo, maduro, queso", precio: 30000 },
+                    { nombre: "La Consentida", desc: "Todas las adiciones juntas", precio: 40000 }
                 ]
             },
             "Perros Calientes": {
                 icono: "🌭",
                 items: [
-                    { nombre: "Sencillo", desc: "Pan, salchicha, guiso o cebolla, ripio, salsas", precio: 8000 },
-                    { nombre: "Mixto", desc: "Tocineta, guiso o cebolla natural, queso, ripio, salsas", precio: 10000 },
-                    { nombre: "Pepi-perro", desc: "Carne mechada o Carne a las finas hiervas a la plancha, salsa, queso, cebolla,", precio: 12000 },
-                    { nombre: "Choriperro", desc: "Chorizo, ensalada, ripio, salsas", precio: 12000 },
-                    { nombre: "Trifásico", desc: "Carne, pollo, chorizo, queso, salsas", precio: 17000 }
+                    { nombre: "Sencillo", desc: "Pan, salchicha, queso, ripio, salsas", precio: 8000 },
+                    { nombre: "Mixto", desc: "Tocineta, queso, salsas...", precio: 10000 },
+                    { nombre: "Pepi-perro", desc: "Carne mechada o pollo", precio: 12000 },
+                    { nombre: "Choriperro", desc: "Chorizo, ensalada, ripio", precio: 12000 },
+                    { nombre: "Trifásico", desc: "Carne, pollo, chorizo, queso", precio: 17000 }
                 ]
             },
             "Pepitos": {
                 icono: "🥖",
                 items: [
-                    { nombre: "Sencillo", desc: "Una proteína (pollo, carne o cerdo), queso, jamón, aguacate, huevo, ripio y salsas", precio: 25000 },
-                    { nombre: "Mixto", desc: "Dos proteínas (pollo, carne o cerdo), doble queso, jamon, aguacate, huevo, tocineta, ripio, salsas", precio: 35000 },
-                    { nombre: "El Barco", desc: "Carne, pollo, cerdo, chorizo, tocineta, jamon, queso, aguacate, huevo, ripio,salsas, maíz", precio: 45000 }
+                    { nombre: "Sencillo", desc: "Una proteína, queso, jamón, aguacate, huevo", precio: 25000 },
+                    { nombre: "Mixto", desc: "Dos proteínas, doble queso, tocineta...", precio: 35000 },
+                    { nombre: "El Barco", desc: "Carne, pollo, cerdo, chorizo, tocineta...", precio: 45000 }
                 ]
             },
             "Pizzas": {
                 icono: "🍕",
                 items: [
-                    { nombre: "Hawaiana (Personal)", desc: "4 Porciones: Salsa napolitana, queso mozarella , piña y jamon", precio: 12000 },
-                    { nombre: "Hawaiana (Mediana)", desc: "8 Porciones: Salsa napolitana, queso mozarella , piña y jamon", precio: 33000 },
-                    { nombre: "Hawaiana (Familiar)", desc: "12 Porciones: Salsa napolitana, queso mozarella , piña y jamon", precio: 45000 },
-                    { nombre: "Pollo Champiñón (Personal)", desc: "4 Porciones: Salsa napolitana, Pollo, Jamón, Champiñones, queso", precio: 12000 },
-                    { nombre: "Pollo Champiñón (Mediana)", desc: "8 Porciones: Salsa napolitana, Pollo, Jamón, Champiñones, queso", precio: 33000 },
-                    { nombre: "Pollo Champiñón (Familiar)", desc: "12 Porciones: Salsa napolitana, Pollo, Jamón, Champiñones, queso", precio: 45000 },
-                    { nombre: "Margarita (Personal)", desc: "4 Porciones: Salsa napolitana, pollo, jamon, pimenton, queso, maíz", precio: 12000 },
-                    { nombre: "Margarita (Mediana)", desc: "8 Porciones: Salsa napolitana, pollo, jamon, pimenton, queso, maíz", precio: 33000 },
-                    { nombre: "Margarita (Familiar)", desc: "12 Porciones: Salsa napolitana, pollo, jamon, pimenton, queso, maíz", precio: 45000 },
-                    { nombre: "Samba (Personal)", desc: "4 Porciones: Salsa napolitana, Maduros, Tocineta, Maíz, y Queso", precio: 12000 },
-                    { nombre: "Samba (Mediana)", desc: "8 Porciones: Salsa napolitana, Maduros, Tocineta, Maíz, y Queso", precio: 33000 },
-                    { nombre: "Samba (Familiar)", desc: "12 Porciones: Salsa napolitana, Maduros, Tocineta, Maíz, y Queso", precio: 45000 },
-                    { nombre: "Jamon y Queso (Personal)", desc: "4 Porciones: Salsa napolitana, Jamon y Queso", precio: 12000 },
-                    { nombre: "Jamon y Queso (Mediana)", desc: "8 Porciones:  Salsa napolitana, Jamon y Queso", precio: 33000 },
-                    { nombre: "Jamon y Queso (Familiar)", desc: "12 Porciones:  Salsa napolitana, Jamon y Queso", precio: 45000 }
+                    { nombre: "Hawaiana (Personal)", desc: "4 Porciones", precio: 12000 },
+                    { nombre: "Hawaiana (Mediana)", desc: "8 Porciones", precio: 33000 },
+                    { nombre: "Pollo Champiñón (Personal)", desc: "4 Porciones", precio: 12000 },
+                    { nombre: "Pollo Champiñón (Mediana)", desc: "8 Porciones", precio: 33000 },
+                    { nombre: "Margarita (Mediana)", desc: "8 Porciones", precio: 33000 },
+                    { nombre: "Jamón y Queso (Familiar)", desc: "12 Porciones", precio: 45000 }
                 ]
             },
             "Carne al Barril": {
                 icono: "🥩",
                 items: [
                     { nombre: "Parrilla Personal", desc: "Con papa, chorizo y ensalada", precio: 15000 },
-                    { nombre: "Parrilla para 2", desc: "Con papa, chorizo y ensalada", precio: 20000 },
                     { nombre: "Parrilla para 2", desc: "Con papa, chorizo y ensalada", precio: 25000 },
-                    { nombre: "Parrilla para 3", desc: "Con papa, chorizo y ensalada", precio: 30000 },
                     { nombre: "Parrilla para 3", desc: "Con papa, chorizo y ensalada", precio: 35000 },
                     { nombre: "Parrilla para 4", desc: "Con papa, chorizo y ensalada", precio: 50000 }
                 ]
@@ -227,26 +213,22 @@
                     { nombre: "Postobón 2,5lts", desc: "", precio: 8000 },
                     { nombre: "Hit litro y medio", desc: "", precio: 7000 },
                     { nombre: "Coca cola de litro", desc: "", precio: 6000 },
-                    { nombre: "Coca cola litro y medio", desc: "", precio: 8000 },
-                    
+                    { nombre: "Coca cola litro y medio", desc: "", precio: 8000 }
                 ]
             }
         };
 
         // --- LÓGICA DE LA APLICACIÓN ---
         let carrito = [];
-        const numeroWhatsApp = "573165593401"; // Tu número con código de Colombia
+        const numeroWhatsApp = "573165593401"; // Tu número
 
-        // Formato de moneda
         const formatoPrecio = (precio) => {
             return "$" + precio.toLocaleString('es-CO');
         };
 
-        // Inicializar Categorías
         function init() {
             const divCategorias = document.getElementById('categorias');
             divCategorias.innerHTML = '';
-            
             for (const cat in menu) {
                 divCategorias.innerHTML += `
                     <button class="btn-categoria" onclick="mostrarProductos('${cat}')">
@@ -257,7 +239,6 @@
             }
         }
 
-        // Mostrar productos de una categoría
         function mostrarProductos(categoria) {
             document.getElementById('categorias').style.display = 'none';
             document.getElementById('productos').style.display = 'block';
@@ -267,7 +248,7 @@
             const lista = document.getElementById('lista-productos');
             lista.innerHTML = '';
 
-            menu[categoria].items.forEach((item, index) => {
+            menu[categoria].items.forEach((item) => {
                 lista.innerHTML += `
                     <div class="producto-card">
                         <div class="producto-info">
@@ -281,13 +262,11 @@
             });
         }
 
-        // Volver al inicio
         function mostrarCategorias() {
             document.getElementById('productos').style.display = 'none';
             document.getElementById('categorias').style.display = 'grid';
         }
 
-        // Funciones del Carrito
         function agregarAlCarrito(nombre, precio) {
             const itemExistente = carrito.find(item => item.nombre === nombre);
             if (itemExistente) {
@@ -297,7 +276,6 @@
             }
             actualizarUI();
             
-            // Efecto visual rápido
             const badge = document.getElementById('badge-carrito');
             badge.style.transform = "scale(1.5)";
             setTimeout(() => badge.style.transform = "scale(1)", 200);
@@ -315,7 +293,6 @@
         }
 
         function actualizarUI() {
-            // Actualizar botón flotante
             const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
             document.getElementById('badge-carrito').innerText = totalItems;
 
@@ -326,19 +303,21 @@
                 cerrarCarrito();
             }
 
-            // Actualizar Modal
             const contenedorItems = document.getElementById('items-carrito');
             contenedorItems.innerHTML = '';
-            
             let totalPrecio = 0;
 
             if (carrito.length === 0) {
                 contenedorItems.innerHTML = '<div class="empty-cart">Tu carrito está vacío</div>';
+                document.getElementById('contenedor-total').style.display = 'none';
+                document.getElementById('seccion-envio').style.display = 'none';
             } else {
+                document.getElementById('contenedor-total').style.display = 'flex';
+                document.getElementById('seccion-envio').style.display = 'block';
+
                 carrito.forEach(item => {
                     const subtotal = item.precio * item.cantidad;
                     totalPrecio += subtotal;
-                    
                     contenedorItems.innerHTML += `
                         <div class="item-carrito">
                             <div>
@@ -358,7 +337,6 @@
             document.getElementById('total-precio').innerText = formatoPrecio(totalPrecio);
         }
 
-        // Manejo del Modal
         function abrirCarrito() {
             document.getElementById('modal-carrito').style.display = 'flex';
         }
@@ -367,9 +345,19 @@
             document.getElementById('modal-carrito').style.display = 'none';
         }
 
-        // Enviar a WhatsApp
         function enviarWhatsApp() {
             if (carrito.length === 0) return;
+
+            // Obtener los datos del formulario
+            const direccion = document.getElementById('cliente-direccion').value.trim();
+            const telefono = document.getElementById('cliente-telefono').value.trim();
+
+            // Validar que no envíen el pedido sin dirección
+            if (direccion === "") {
+                alert("⚠️ Por favor, escribe tu dirección exacta antes de enviar el pedido.");
+                document.getElementById('cliente-direccion').focus();
+                return;
+            }
 
             let texto = "*¡Hola El Punto del Sabor!* 👋%0AQuiero realizar el siguiente pedido:%0A%0A";
             let total = 0;
@@ -380,21 +368,29 @@
                 texto += `▪️ ${item.cantidad}x ${item.nombre} - ${formatoPrecio(subtotal)}%0A`;
             });
 
-            texto += `%0A*TOTAL: ${formatoPrecio(total)}*%0A%0A_Por favor confirmar mi pedido y tiempo de entrega. ¡Gracias!_`;
+            texto += `%0A*TOTAL: ${formatoPrecio(total)}*%0A%0A`;
+            
+            // Agregar los datos de envío al mensaje
+            texto += `🛵 *DATOS DE ENVÍO:*%0A`;
+            texto += `📍 Dirección: ${direccion}%0A`;
+            if (telefono !== "") {
+                texto += `📞 Teléfono: ${telefono}%0A`;
+            }
+            texto += `%0A_Nota: Te enviaré mi ubicación por aquí para que el domiciliario llegue más fácil._%0A%0A_Por favor confirmar mi pedido y tiempo de entrega. ¡Gracias!_`;
 
             const url = `https://wa.me/${numeroWhatsApp}?text=${texto}`;
             
-            // Limpiar carrito (opcional)
+            // Limpiar todo después de enviar
             carrito = [];
+            document.getElementById('cliente-direccion').value = "";
+            document.getElementById('cliente-telefono').value = "";
             actualizarUI();
             cerrarCarrito();
             mostrarCategorias();
 
-            // Abrir WhatsApp
             window.open(url, '_blank');
         }
 
-        // Iniciar App
         init();
         actualizarUI();
     </script>
