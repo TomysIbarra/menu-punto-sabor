@@ -65,8 +65,9 @@
         /* Estilos para los campos de datos de envío */
         .datos-envio { margin-top: 15px; border-top: 1px solid #333; padding-top: 15px; }
         .datos-envio h3 { margin: 0 0 10px 0; font-size: 16px; color: var(--primary); }
-        .input-form { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #555; background-color: #222; color: white; font-size: 14px; }
+        .input-form { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #555; background-color: #222; color: white; font-size: 14px; font-family: inherit; }
         .input-form:focus { outline: none; border-color: var(--primary); }
+        textarea.input-form { resize: vertical; min-height: 60px; }
         .hint-text { font-size: 11px; color: #aaa; margin: 0 0 10px 0; line-height: 1.4; }
     </style>
 </head>
@@ -109,11 +110,13 @@
                 <span id="total-precio">$0</span>
             </div>
 
-            <!-- FORMULARIO DE ENVÍO -->
+            <!-- FORMULARIO DE ENVÍO Y NOTAS -->
             <div class="datos-envio" id="seccion-envio" style="display:none;">
                 <h3>Datos para la entrega 🛵</h3>
                 <input type="text" id="cliente-direccion" class="input-form" placeholder="Tu dirección exacta (Ej: Calle 10 # 5-20)">
                 <input type="tel" id="cliente-telefono" class="input-form" placeholder="Número de teléfono (Opcional)">
+                <textarea id="cliente-notas" class="input-form" placeholder="Notas para el pedido (Ej: Sin cebolla, salsas aparte...)"></textarea>
+                
                 <p class="hint-text">💡 <b>Sugerencia:</b> Una vez nos envíes el pedido, puedes compartirnos tu ubicación GPS por WhatsApp para llegar más rápido.</p>
                 
                 <button class="btn-whatsapp" onclick="enviarWhatsApp()">
@@ -351,6 +354,7 @@
             // Obtener los datos del formulario
             const direccion = document.getElementById('cliente-direccion').value.trim();
             const telefono = document.getElementById('cliente-telefono').value.trim();
+            const notas = document.getElementById('cliente-notas').value.trim();
 
             // Validar que no envíen el pedido sin dirección
             if (direccion === "") {
@@ -370,6 +374,11 @@
 
             texto += `%0A*TOTAL: ${formatoPrecio(total)}*%0A%0A`;
             
+            // Agregar notas si existen
+            if (notas !== "") {
+                texto += `📝 *Notas del pedido:* ${notas}%0A%0A`;
+            }
+
             // Agregar los datos de envío al mensaje
             texto += `🛵 *DATOS DE ENVÍO:*%0A`;
             texto += `📍 Dirección: ${direccion}%0A`;
@@ -384,6 +393,7 @@
             carrito = [];
             document.getElementById('cliente-direccion').value = "";
             document.getElementById('cliente-telefono').value = "";
+            document.getElementById('cliente-notas').value = "";
             actualizarUI();
             cerrarCarrito();
             mostrarCategorias();
