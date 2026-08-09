@@ -6,14 +6,6 @@
     <title>Menú - El Punto del Sabor</title>
     <style>
         /* ESTILOS (DISEÑO) */
- <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú - El Punto del Sabor</title>
-    <style>
-        /* ESTILOS (DISEÑO) */
         :root {
             --primary: #FFCC00; /* Amarillo Simpsons */
             --secondary: #E31837; /* Rojo */
@@ -44,7 +36,7 @@
         .producto-card { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--secondary); display: flex; justify-content: space-between; align-items: center; }
         .producto-info h3 { margin: 0 0 5px 0; font-size: 18px; color: var(--primary); }
         .producto-info p { margin: 0 0 8px 0; font-size: 12px; color: #aaa; max-width: 200px;}
-        .producto-precio { font-weight: bold; font-size: 16px; }
+        .producto-precio { font-weight: bold; font-size: 16px; color: var(--text-light); }
         
         .btn-agregar { background-color: var(--secondary); color: white; border: none; border-radius: 8px; padding: 10px 15px; font-weight: bold; cursor: pointer; font-size: 18px; }
         .btn-agregar:active { transform: scale(0.95); }
@@ -55,7 +47,7 @@
 
         /* Modal del Carrito */
         #modal-carrito { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background-color: var(--bg-dark); width: 100%; max-width: 400px; border-radius: 15px; border: 2px solid var(--primary); padding: 20px; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background-color: var(--bg-dark); width: 100%; max-width: 400px; border-radius: 15px; border: 2px solid var(--primary); padding: 20px; max-height: 90vh; overflow-y: auto; color: var(--text-light); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .modal-header h2 { margin: 0; color: var(--primary); }
         .btn-cerrar { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
@@ -126,7 +118,7 @@
                 <input type="tel" id="cliente-telefono" class="input-form" placeholder="Número de teléfono (Opcional)">
                 <textarea id="cliente-notas" class="input-form" placeholder="Notas para el pedido (Ej: Sin cebolla, salsas aparte...)"></textarea>
                 
-                <!-- NUEVO BOTÓN DE CAPTURA DE GPS AUTOMÁTICA -->
+                <!-- BOTÓN DE CAPTURA DE GPS AUTOMÁTICA -->
                 <button type="button" class="btn-ubicacion" onclick="obtenerUbicacionGPS()">
                     📍 Compartir mi ubicación GPS automática
                 </button>
@@ -236,8 +228,8 @@
 
         // --- LÓGICA DE LA APLICACIÓN ---
         let carrito = [];
-        let coordenadasGPS = ""; // Variable para guardar el link de Google Maps de la ubicación del cliente
-        const numeroWhatsApp = "573027217187"; // Tu número
+        let coordenadasGPS = ""; 
+        const numeroWhatsApp = "573165593401"; 
 
         const formatoPrecio = (precio) => {
             return "$" + precio.toLocaleString('es-CO');
@@ -364,7 +356,6 @@
             document.getElementById('modal-carrito').style.display = 'none';
         }
 
-        // --- FUNCIÓN PARA OBTENER GPS AUTOMÁTICO ---
         function obtenerUbicacionGPS() {
             const estadoGps = document.getElementById('estado-gps');
             if (!navigator.geolocation) {
@@ -378,7 +369,6 @@
                 (position) => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
-                    // Creamos el enlace directo a Google Maps con las coordenadas exactas del celular del cliente
                     coordenadasGPS = `https://maps.google.com/?q=${lat},${lon}`;
                     estadoGps.innerText = "✅ ¡Ubicación GPS obtenida con éxito!";
                 },
@@ -420,9 +410,8 @@
             texto += `🛵 *DATOS DE ENVÍO:*%0A`;
             texto += `📍 Dirección: ${direccion}%0A`;
             
-            // Si el cliente hizo clic en el botón de GPS, se adjunta automáticamente el enlace de Google Maps al mensaje de WhatsApp
             if (coordenadasGPS !== "") {
-                texto += `📍 *Ubicación GPS exactas:* ${coordenadasGPS}%0A`;
+                texto += `📍 *Ubicación GPS exacta:* ${coordenadasGPS}%0A`;
             }
 
             if (telefono !== "") {
@@ -433,7 +422,6 @@
 
             const url = `https://wa.me/${numeroWhatsApp}?text=${texto}`;
             
-            // Limpiar todo después de enviar
             carrito = [];
             coordenadasGPS = "";
             document.getElementById('cliente-direccion').value = "";
