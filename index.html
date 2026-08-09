@@ -6,6 +6,14 @@
     <title>Menú - El Punto del Sabor</title>
     <style>
         /* ESTILOS (DISEÑO) */
+ <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú - El Punto del Sabor</title>
+    <style>
+        /* ESTILOS (DISEÑO) */
         :root {
             --primary: #FFCC00; /* Amarillo Simpsons */
             --secondary: #E31837; /* Rojo */
@@ -59,6 +67,7 @@
         .total-container { display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; margin-top: 15px; margin-bottom: 15px; color: var(--primary); }
         
         .btn-whatsapp { display: block; width: 100%; background-color: #25D366; color: white; text-align: center; padding: 15px; text-decoration: none; border-radius: 10px; font-size: 18px; font-weight: bold; margin-top: 15px; border: none; cursor: pointer; }
+        .btn-ubicacion { display: block; width: 100%; background-color: #007bff; color: white; text-align: center; padding: 12px; text-decoration: none; border-radius: 10px; font-size: 14px; font-weight: bold; margin-bottom: 10px; border: none; cursor: pointer; }
         
         .empty-cart { text-align: center; color: #aaa; margin: 20px 0; }
 
@@ -117,7 +126,11 @@
                 <input type="tel" id="cliente-telefono" class="input-form" placeholder="Número de teléfono (Opcional)">
                 <textarea id="cliente-notas" class="input-form" placeholder="Notas para el pedido (Ej: Sin cebolla, salsas aparte...)"></textarea>
                 
-                <p class="hint-text">💡 <b>Sugerencia:</b> Al enviar tu pedido, recuerda compartir tu ubicación de WhatsApp para que el domiciliario llegue más rápido.</p>
+                <!-- NUEVO BOTÓN DE CAPTURA DE GPS AUTOMÁTICA -->
+                <button type="button" class="btn-ubicacion" onclick="obtenerUbicacionGPS()">
+                    📍 Compartir mi ubicación GPS automática
+                </button>
+                <p id="estado-gps" class="hint-text" style="color: var(--primary); text-align: center; margin-bottom: 10px;"></p>
                 
                 <button class="btn-whatsapp" onclick="enviarWhatsApp()">
                     Enviar Pedido por WhatsApp
@@ -223,6 +236,7 @@
 
         // --- LÓGICA DE LA APLICACIÓN ---
         let carrito = [];
+        let coordenadasGPS = ""; // Variable para guardar el link de Google Maps de la ubicación del cliente
         const numeroWhatsApp = "573165593401"; // Tu número
 
         const formatoPrecio = (precio) => {
@@ -350,15 +364,38 @@
             document.getElementById('modal-carrito').style.display = 'none';
         }
 
+        // --- FUNCIÓN PARA OBTENER GPS AUTOMÁTICO ---
+        function obtenerUbicacionGPS() {
+            const estadoGps = document.getElementById('estado-gps');
+            if (!navigator.geolocation) {
+                estadoGps.innerText = "❌ Tu navegador no soporta geolocalización.";
+                return;
+            }
+
+            estadoGps.innerText = "⏳ Obteniendo ubicación GPS, por favor acepta el permiso...";
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    // Creamos el enlace directo a Google Maps con las coordenadas exactas del celular del cliente
+                    coordenadasGPS = `https://maps.google.com/?q=${lat},${lon}`;
+                    estadoGps.innerText = "✅ ¡Ubicación GPS obtenida con éxito!";
+                },
+                (error) => {
+                    estadoGps.innerText = "❌ No se pudo obtener la ubicación. Por favor escribe bien tu dirección.";
+                },
+                { enableHighAccuracy: true }
+            );
+        }
+
         function enviarWhatsApp() {
             if (carrito.length === 0) return;
 
-            // Obtener los datos del formulario
             const direccion = document.getElementById('cliente-direccion').value.trim();
             const telefono = document.getElementById('cliente-telefono').value.trim();
             const notas = document.getElementById('cliente-notas').value.trim();
 
-            // Validar que no envíen el pedido sin dirección
             if (direccion === "") {
                 alert("⚠️ Por favor, escribe tu dirección exacta antes de enviar el pedido.");
                 document.getElementById('cliente-direccion').focus();
@@ -376,26 +413,33 @@
 
             texto += `%0A*TOTAL: ${formatoPrecio(total)}*%0A%0A`;
             
-            // Agregar notas si existen
             if (notas !== "") {
                 texto += `📝 *Notas del pedido:* ${notas}%0A%0A`;
             }
 
-            // Agregar los datos de envío al mensaje
             texto += `🛵 *DATOS DE ENVÍO:*%0A`;
             texto += `📍 Dirección: ${direccion}%0A`;
+            
+            // Si el cliente hizo clic en el botón de GPS, se adjunta automáticamente el enlace de Google Maps al mensaje de WhatsApp
+            if (coordenadasGPS !== "") {
+                texto += `📍 *Ubicación GPS exactas:* ${coordenadasGPS}%0A`;
+            }
+
             if (telefono !== "") {
                 texto += `📞 Teléfono: ${telefono}%0A`;
             }
-            texto += `%0A_📍 Por favor comparte tu ubicación de WhatsApp para que el domiciliario llegue más rápido._%0A%0A_Por favor confirmar mi pedido y tiempo de entrega. ¡Gracias!_`;
+
+            texto += `%0A_Por favor confirmar mi pedido y tiempo de entrega. ¡Gracias!_`;
 
             const url = `https://wa.me/${numeroWhatsApp}?text=${texto}`;
             
             // Limpiar todo después de enviar
             carrito = [];
+            coordenadasGPS = "";
             document.getElementById('cliente-direccion').value = "";
             document.getElementById('cliente-telefono').value = "";
             document.getElementById('cliente-notas').value = "";
+            document.getElementById('estado-gps').innerText = "";
             actualizarUI();
             cerrarCarrito();
             mostrarCategorias();
