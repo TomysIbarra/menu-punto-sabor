@@ -50,10 +50,10 @@
         .btn-agregar { background-color: var(--secondary); color: white; border: none; border-radius: 8px; padding: 10px 15px; font-weight: bold; cursor: pointer; font-size: 18px; }
         .btn-agregar:active { transform: scale(0.95); }
 
-        /* Estilos específicos para el acordeón interactivo de Pizzas */
+        /* Estilos específicos para acordeones interactivos */
         .pizza-card-interactive { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--secondary); }
         .pizza-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .pizza-arrow { font-size: 18px; color: var(--primary); transition: transform 0.3s; }
+        .pizza-arrow { font-size: 15px; color: var(--primary); transition: transform 0.3s; white-space: nowrap; margin-left: 10px;}
         .pizza-body { display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 10px; }
         .pizza-option-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #252525; padding: 10px; border-radius: 8px; }
         .pizza-option-info h4 { margin: 0 0 3px 0; font-size: 14px; color: var(--text-light); }
@@ -165,18 +165,47 @@
             },
             "Salchipapas": {
                 icono: "🍟",
-                items: [
-                    { nombre: "Sencilla", desc: "Personal", precio: 8000 },
-                    { nombre: "Con Queso", desc: "Personal", precio: 9000 },
-                    { nombre: "Doble Queso", desc: "Personal", precio: 10000 },
-                    { nombre: "Tocineta y Queso", desc: "Personal", precio: 11000 },
-                    { nombre: "Chorizo y Queso", desc: "Personal", precio: 12000 },
-                    { nombre: "Pollo y Queso", desc: "Personal", precio: 13000 },
-                    { nombre: "Carne Mechada y Queso", desc: "Personal", precio: 14000 },
-                    { nombre: "Mixta (Personal)", desc: "Carne, pollo, costilla, queso...", precio: 17000 },
-                    { nombre: "Familiar Básico", desc: "Papa, salchicha, ripio", precio: 16000 },
-                    { nombre: "Familiar Full", desc: "Costilla, tocineta, chorizo, maduro, queso", precio: 30000 },
-                    { nombre: "La Consentida", desc: "Todas las adiciones juntas", precio: 40000 }
+                esAcordeonSalchipapas: true,
+                secciones: [
+                    {
+                        titulo: "Salchipapas Personales",
+                        desc: "Tamaño personal con papas crujientes y deliciosos acompañamientos",
+                        items: [
+                            { nombre: "Sencilla", desc: "Personal", precio: 8000 },
+                            { nombre: "Con Queso", desc: "Personal", precio: 9000 },
+                            { nombre: "Doble Queso", desc: "Personal", precio: 10000 },
+                            { nombre: "Guiso más queso", desc: "Personal", precio: 10000 },
+                            { nombre: "Tocineta y Queso", desc: "Personal", precio: 11000 },
+                            { nombre: "Chorizo y Queso", desc: "Personal", precio: 12000 },
+                            { nombre: "Pollo y Queso", desc: "Personal", precio: 13000 },
+                            { nombre: "Carne Mechada y Queso", desc: "Personal", precio: 14000 },
+                            { nombre: "Costilla, madurito y queso", desc: "Personal", precio: 15000 },
+                            { nombre: "Costipapa", desc: "Personal", precio: 16000 },
+                            { nombre: "Carne mechada, madurito y queso", desc: "Personal", precio: 15000 },
+                            { nombre: "Pollo mechado, madurito y queso", desc: "Personal", precio: 15000 },
+                            { nombre: "Mixta (Carne, pollo y queso)", desc: "Personal", precio: 15000 },
+                            { nombre: "Costilla, carne mechada y queso", desc: "Personal", precio: 17000 }
+                        ]
+                    },
+                    {
+                        titulo: "Salchipapas Familiares",
+                        desc: "Ideales para compartir entre amigos y familia",
+                        items: [
+                            { nombre: "Papa, salchicha, ripio, papas", desc: "Familiar Básico", precio: 16000 },
+                            { nombre: "Costilla, tocineta, maduro y queso", desc: "Familiar", precio: 20000 },
+                            { nombre: "Tocineta, chorizo, maduro y queso", desc: "Familiar", precio: 26000 },
+                            { nombre: "Costilla, tocineta, chorizo, maduro y queso", desc: "Familiar Full", precio: 30000 }
+                        ]
+                    },
+                    {
+                        titulo: "Salchipapas Consentidas",
+                        desc: "Todas nuestras consentidas tienen un valor de $40.000",
+                        items: [
+                            { nombre: "Consentida 1", desc: "Maíz, Carne Mechada, Maduros, Alitas BBQ", precio: 40000 },
+                            { nombre: "Consentida 2", desc: "Pollo salteado, Tocineta, Lomo, Piña calada", precio: 40000 },
+                            { nombre: "Consentida 3", desc: "Costilla, Chorizo, Queso gratinado, Pollo Mechado", precio: 40000 }
+                        ]
+                    }
                 ]
             },
             "Perros Calientes": {
@@ -199,7 +228,7 @@
             },
             "Pizzas": {
                 icono: "🍕",
-                esInteractivo: true, // Propiedad especial para mostrar el acordeón
+                esInteractivo: true,
                 tamanios: ["Personal", "Mediana (4 porciones)", "Grande (8 porciones)", "Familiar (12 porciones)"],
                 items: [
                     { nombre: "Hawaiana", desc: "Salsa napolitana, queso mozzarella, piña y jamón", precios: [12000, 33000, 40000, 45000] },
@@ -278,7 +307,6 @@
 
             const datosCat = menu[categoria];
 
-            // Si la categoría es interactiva (Pizzas)
             if (datosCat.esInteractivo) {
                 datosCat.items.forEach((pizza, index) => {
                     let opcionesHTML = '';
@@ -310,8 +338,40 @@
                         </div>
                     `;
                 });
-            } else {
-                // Renderizado normal para el resto de categorías
+            } 
+            else if (datosCat.esAcordeonSalchipapas) {
+                datosCat.secciones.forEach((seccion, index) => {
+                    let opcionesHTML = '';
+                    seccion.items.forEach((item) => {
+                        opcionesHTML += `
+                            <div class="pizza-option-row">
+                                <div class="pizza-option-info">
+                                    <h4>${item.nombre}</h4>
+                                    <span style="font-size:11px; color:#aaa; display:block; margin:2px 0;">${item.desc}</span>
+                                    <span>${formatoPrecio(item.precio)}</span>
+                                </div>
+                                <button class="btn-agregar" onclick="agregarAlCarrito('${categoria}', '${seccion.titulo} - ${item.nombre}', ${item.precio})">+</button>
+                            </div>
+                        `;
+                    });
+
+                    lista.innerHTML += `
+                        <div class="pizza-card-interactive">
+                            <div class="pizza-header" onclick="toggleSalchipapa(${index})">
+                                <div class="producto-info">
+                                    <h3>${seccion.titulo}</h3>
+                                    <p>${seccion.desc}</p>
+                                </div>
+                                <span class="pizza-arrow" id="salchi-arrow-${index}">▼ Ver Opciones</span>
+                            </div>
+                            <div class="pizza-body" id="salchi-body-${index}">
+                                ${opcionesHTML}
+                            </div>
+                        </div>
+                    `;
+                });
+            } 
+            else {
                 datosCat.items.forEach((item) => {
                     lista.innerHTML += `
                         <div class="producto-card">
@@ -327,13 +387,24 @@
             }
         }
 
-        // Función para abrir/cerrar el acordeón de cada pizza
         function togglePizza(index) {
             const body = document.getElementById(`pizza-body-${index}`);
             const arrow = document.getElementById(`arrow-${index}`);
             if (body.style.display === "block") {
                 body.style.display = "none";
                 arrow.innerText = "▼ Ver Tamaños";
+            } else {
+                body.style.display = "block";
+                arrow.innerText = "▲ Ocultar";
+            }
+        }
+
+        function toggleSalchipapa(index) {
+            const body = document.getElementById(`salchi-body-${index}`);
+            const arrow = document.getElementById(`salchi-arrow-${index}`);
+            if (body.style.display === "block") {
+                body.style.display = "none";
+                arrow.innerText = "▼ Ver Opciones";
             } else {
                 body.style.display = "block";
                 arrow.innerText = "▲ Ocultar";
