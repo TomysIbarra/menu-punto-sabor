@@ -240,11 +240,28 @@
             },
             "Carne al Barril": {
                 icono: "🥩",
+                esAcordeonBarril: true,
                 items: [
-                    { nombre: "Parrilla Personal", desc: "Con papa, chorizo y ensalada", precio: 15000 },
-                    { nombre: "Parrilla para 2", desc: "Con papa, chorizo y ensalada", precio: 25000 },
-                    { nombre: "Parrilla para 3", desc: "Con papa, chorizo y ensalada", precio: 35000 },
-                    { nombre: "Parrilla para 4", desc: "Con papa, chorizo y ensalada", precio: 50000 }
+                    { 
+                        nombre: "Parrilla Personal", 
+                        desc: "Papa amarilla o francesa, chorizo, ensalada y carne de cerdo", 
+                        precios: [{ tipo: "Estándar", precio: 15000 }] 
+                    },
+                    { 
+                        nombre: "Parrilla para 2", 
+                        desc: "Papa amarilla o francesa, chorizo, ensalada y carne de cerdo", 
+                        precios: [{ tipo: "Opción 1", precio: 20000 }, { tipo: "Opción 2", precio: 25000 }] 
+                    },
+                    { 
+                        nombre: "Parrilla para 3", 
+                        desc: "Papa amarilla o francesa, chorizo, ensalada y carne de cerdo", 
+                        precios: [{ tipo: "Opción 1", precio: 30000 }, { tipo: "Opción 2", precio: 35000 }] 
+                    },
+                    { 
+                        nombre: "Parrilla para 4", 
+                        desc: "Papa amarilla o francesa, chorizo, ensalada y carne de cerdo", 
+                        precios: [{ tipo: "Estándar", precio: 50000 }] 
+                    }
                 ]
             },
             "Adicionales": {
@@ -370,7 +387,39 @@
                         </div>
                     `;
                 });
-            } 
+            }
+            else if (datosCat.esAcordeonBarril) {
+                datosCat.items.forEach((parrilla, index) => {
+                    let opcionesHTML = '';
+                    parrilla.precios.forEach((p) => {
+                        let nombreItemFinal = p.tipo === "Estándar" ? parrilla.nombre : `${parrilla.nombre} (${p.tipo})`;
+                        opcionesHTML += `
+                            <div class="pizza-option-row">
+                                <div class="pizza-option-info">
+                                    <h4>${p.tipo === "Estándar" ? "Precio único" : p.tipo}</h4>
+                                    <span>${formatoPrecio(p.precio)}</span>
+                                </div>
+                                <button class="btn-agregar" onclick="agregarAlCarrito('${categoria}', '${nombreItemFinal}', ${p.precio})">+</button>
+                            </div>
+                        `;
+                    });
+
+                    lista.innerHTML += `
+                        <div class="pizza-card-interactive">
+                            <div class="pizza-header" onclick="toggleBarril(${index})">
+                                <div class="producto-info">
+                                    <h3>${parrilla.nombre}</h3>
+                                    <p>${parrilla.desc}</p>
+                                </div>
+                                <span class="pizza-arrow" id="barril-arrow-${index}">▼ Ver Opciones</span>
+                            </div>
+                            <div class="pizza-body" id="barril-body-${index}">
+                                ${opcionesHTML}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
             else {
                 datosCat.items.forEach((item) => {
                     lista.innerHTML += `
@@ -402,6 +451,18 @@
         function toggleSalchipapa(index) {
             const body = document.getElementById(`salchi-body-${index}`);
             const arrow = document.getElementById(`salchi-arrow-${index}`);
+            if (body.style.display === "block") {
+                body.style.display = "none";
+                arrow.innerText = "▼ Ver Opciones";
+            } else {
+                body.style.display = "block";
+                arrow.innerText = "▲ Ocultar";
+            }
+        }
+
+        function toggleBarril(index) {
+            const body = document.getElementById(`barril-body-${index}`);
+            const arrow = document.getElementById(`barril-arrow-${index}`);
             if (body.style.display === "block") {
                 body.style.display = "none";
                 arrow.innerText = "▼ Ver Opciones";
@@ -579,4 +640,5 @@
         actualizarUI();
     </script>
 </body>
+</html>
 </html>
