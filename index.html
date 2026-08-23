@@ -50,6 +50,15 @@
         .btn-agregar { background-color: var(--secondary); color: white; border: none; border-radius: 8px; padding: 10px 15px; font-weight: bold; cursor: pointer; font-size: 18px; }
         .btn-agregar:active { transform: scale(0.95); }
 
+        /* Estilos específicos para el acordeón interactivo de Pizzas */
+        .pizza-card-interactive { background-color: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--secondary); }
+        .pizza-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .pizza-arrow { font-size: 18px; color: var(--primary); transition: transform 0.3s; }
+        .pizza-body { display: none; margin-top: 15px; border-top: 1px dashed #444; padding-top: 10px; }
+        .pizza-option-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: #252525; padding: 10px; border-radius: 8px; }
+        .pizza-option-info h4 { margin: 0 0 3px 0; font-size: 14px; color: var(--text-light); }
+        .pizza-option-info span { font-size: 12px; color: var(--primary); font-weight: bold; }
+
         /* Carrito Flotante */
         #btn-carrito-flotante { position: fixed; bottom: 20px; right: 20px; background-color: var(--primary); color: var(--bg-dark); border: none; border-radius: 50px; padding: 15px 25px; font-size: 16px; font-weight: bold; box-shadow: 0 5px 15px rgba(255,204,0,0.4); cursor: pointer; z-index: 1000; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
         #badge-carrito { background: var(--secondary); color: white; border-radius: 50%; padding: 2px 8px; font-size: 14px; }
@@ -190,22 +199,14 @@
             },
             "Pizzas": {
                 icono: "🍕",
+                esInteractivo: true, // Propiedad especial para mostrar el acordeón
+                tamanios: ["Personal", "Mediana (4 porciones)", "Grande (8 porciones)", "Familiar (12 porciones)"],
                 items: [
-                    { nombre: "Hawaiana (Personal)", desc: "4 Porciones", precio: 12000 },
-                    { nombre: "Hawaiana (Mediana)", desc: "8 Porciones", precio: 33000 },
-                    { nombre: "Hawaiana (Familiar)", desc: "12 Porciones", precio: 45000 },
-                    { nombre: "Pollo Champiñón (Personal)", desc: "4 Porciones", precio: 12000 },
-                    { nombre: "Pollo Champiñón (Mediana)", desc: "8 Porciones", precio: 33000 },
-                    { nombre: "Pollo Champiñón (Familiar)", desc: "12 Porciones", precio: 45000 },
-                    { nombre: "Margarita (Personal)", desc: "4 Porciones", precio: 12000 },
-                    { nombre: "Margarita (Mediana)", desc: "8 Porciones", precio: 33000 },
-                    { nombre: "Margarita (Familiar)", desc: "8 Porciones", precio: 45000 },
-                    { nombre: "Jamón y Queso (Personal)", desc: "4 Porciones", precio: 12000 },
-                    { nombre: "Jamón y Queso (Mediano)", desc: "8 Porciones", precio: 33000 },
-                    { nombre: "Jamón y Queso (Familiar)", desc: "12 Porciones", precio: 45000 },
-                    { nombre: "Samba (Personal)", desc: "4 Porciones", precio: 12000 },
-                    { nombre: "Samba (Mediano)", desc: "8 Porciones", precio: 33000 },
-                    { nombre: "Samba (Familiar)", desc: "12 Porciones", precio: 45000}
+                    { nombre: "Hawaiana", desc: "Salsa napolitana, queso mozzarella, piña y jamón", precios: [12000, 33000, 40000, 45000] },
+                    { nombre: "Pollo Champiñón", desc: "Salsa napolitana, pollo, jamón, champiñones, queso", precios: [12000, 33000, 40000, 45000] },
+                    { nombre: "Margarita", desc: "Salsa napolitana, pollo, jamón, pimentón, queso, maíz", precios: [12000, 33000, 40000, 45000] },
+                    { nombre: "Samba", desc: "Salsa napolitana, maduros, tocinetas, maíz y queso", precios: [12000, 33000, 40000, 45000] },
+                    { nombre: "Jamón y Queso", desc: "Salsa napolitana, jamón y queso", precios: [12000, 33000, 40000, 45000] }
                 ]
             },
             "Carne al Barril": {
@@ -275,18 +276,68 @@
             const lista = document.getElementById('lista-productos');
             lista.innerHTML = '';
 
-            menu[categoria].items.forEach((item) => {
-                lista.innerHTML += `
-                    <div class="producto-card">
-                        <div class="producto-info">
-                            <h3>${item.nombre}</h3>
-                            <p>${item.desc}</p>
-                            <div class="producto-precio">${formatoPrecio(item.precio)}</div>
+            const datosCat = menu[categoria];
+
+            // Si la categoría es interactiva (Pizzas)
+            if (datosCat.esInteractivo) {
+                datosCat.items.forEach((pizza, index) => {
+                    let opcionesHTML = '';
+                    pizza.precios.forEach((precioSize, iSize) => {
+                        const nombreTamano = datosCat.tamanios[iSize];
+                        opcionesHTML += `
+                            <div class="pizza-option-row">
+                                <div class="pizza-option-info">
+                                    <h4>${nombreTamano}</h4>
+                                    <span>${formatoPrecio(precioSize)}</span>
+                                </div>
+                                <button class="btn-agregar" onclick="agregarAlCarrito('${categoria}', '${pizza.nombre} (${nombreTamano})', ${precioSize})">+</button>
+                            </div>
+                        `;
+                    });
+
+                    lista.innerHTML += `
+                        <div class="pizza-card-interactive">
+                            <div class="pizza-header" onclick="togglePizza(${index})">
+                                <div class="producto-info">
+                                    <h3>${pizza.nombre}</h3>
+                                    <p>${pizza.desc}</p>
+                                </div>
+                                <span class="pizza-arrow" id="arrow-${index}">▼ Ver Tamaños</span>
+                            </div>
+                            <div class="pizza-body" id="pizza-body-${index}">
+                                ${opcionesHTML}
+                            </div>
                         </div>
-                        <button class="btn-agregar" onclick="agregarAlCarrito('${categoria}', '${item.nombre}', ${item.precio})">+</button>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            } else {
+                // Renderizado normal para el resto de categorías
+                datosCat.items.forEach((item) => {
+                    lista.innerHTML += `
+                        <div class="producto-card">
+                            <div class="producto-info">
+                                <h3>${item.nombre}</h3>
+                                <p>${item.desc}</p>
+                                <div class="producto-precio">${formatoPrecio(item.precio)}</div>
+                            </div>
+                            <button class="btn-agregar" onclick="agregarAlCarrito('${categoria}', '${item.nombre}', ${item.precio})">+</button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // Función para abrir/cerrar el acordeón de cada pizza
+        function togglePizza(index) {
+            const body = document.getElementById(`pizza-body-${index}`);
+            const arrow = document.getElementById(`arrow-${index}`);
+            if (body.style.display === "block") {
+                body.style.display = "none";
+                arrow.innerText = "▼ Ver Tamaños";
+            } else {
+                body.style.display = "block";
+                arrow.innerText = "▲ Ocultar";
+            }
         }
 
         function mostrarCategorias() {
